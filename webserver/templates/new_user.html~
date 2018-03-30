@@ -1,0 +1,20 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h2>Create User ID and Password</h2>
+
+<form method="POST" action="/login2">
+<p>Name: <input type="text" name="name"> User ID: <input type="text" name="userid"> Password: <input type="text" name="password"> <input type="submit" value="Create"></p>
+</form>
+
+</body>
+
+
+</html>

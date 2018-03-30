@@ -46,11 +46,12 @@ engine = create_engine(DATABASEURI)
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  id serial,
-  name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+
+# result = engine.execute("""SELECT * FROM users;""")
+# for row in result:
+#   print(type(row))
+
+# engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""") 
 
 
 @app.before_request
@@ -113,10 +114,10 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
+  cursor = g.conn.execute("SELECT * FROM artists;")
   names = []
   for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
+    names.append(result['artist_name'])  # can also be accessed using result[0]
   cursor.close()
 
   #
@@ -162,9 +163,17 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
-@app.route('/another')
-def another():
-  return render_template("another.html")
+@app.route('/new_user')
+def new_user():
+  return render_template("new_user.html")
+
+@app.route('/fail_new_user')
+def fail_new_user():
+  return render_template("fail_new_user.html")
+
+@app.route('/login_fail')
+def login_fail():
+  return render_template("login_fail.html")
 
 
 # Example of adding new data to the database
@@ -174,11 +183,33 @@ def add():
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
 
+@app.route('/add_new_user', methods=['POST'])
+def add_new_user():
+  name = request.form['name']
+  userid = request.form['userid']
+  password = request.form['password']
+  try:
+    g.conn.execute('INSERT INTO users VALUES (%s, %s, %s)', userid, name, password)
+    return redirect('/')
+  except Exception as e:
+    return redirect('/fail_new_user')
 
 @app.route('/login')
 def login():
     abort(401)
     this_is_never_executed()
+
+@app.route('/login2', methods=['POST'])
+def login2():
+  userid = request.form['userid']
+  password = request.form['password']
+  result = g.conn.execute("SELECT pwd FROM users WHERE users.userid=%s;", userid)
+  for row in result:
+    if password == row['pwd']:
+      print('Successful login')
+      return redirect('/')
+    else:
+      return redirect('/login_fail')
 
 
 if __name__ == "__main__":
