@@ -167,6 +167,10 @@ def index():
 def new_user():
   return render_template("new_user.html")
 
+@app.route('/logout')
+def logout():
+  return render_template("index.html")
+
 @app.route('/fail_new_user')
 def fail_new_user():
   return render_template("fail_new_user.html")
@@ -175,8 +179,8 @@ def fail_new_user():
 def login_fail():
   return render_template("login_fail.html")
 
-@app.route('/login_fail')
-def login_fail():
+@app.route('/homepage')
+def homepage():
   return render_template("homepage.html")
 
 # Example of adding new data to the database
