@@ -175,6 +175,9 @@ def fail_new_user():
 def login_fail():
   return render_template("login_fail.html")
 
+@app.route('/login_fail')
+def login_fail():
+  return render_template("homepage.html")
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
@@ -207,7 +210,7 @@ def login2():
   for row in result:
     if password == row['pwd']:
       print('Successful login')
-      return redirect('/')
+      return redirect('/homepage')
     else:
       return redirect('/login_fail')
 
