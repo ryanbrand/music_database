@@ -17,11 +17,10 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, session, current_app
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
-
 
 #
 # The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
@@ -181,7 +180,23 @@ def login_fail():
 
 @app.route('/homepage')
 def homepage():
-  return render_template("homepage.html")
+  #artists_result = g.conn.execute("SELECT artist_name FROM artists  WHERE .userid=%s;", USERID)
+  #artists = ''
+  #for a in artists:
+  #  artists = artists  + str(a['artist_name']) + '\n'
+  #artists_result.close()
+  #albums_result = g.conn.execute("SELECT album_name FROM albums WHERE users.userid=%s;", USERID)
+  songs_result = g.conn.execute("SELECT song_title FROM song_saved_by s WHERE s.userid=%s;", current_app.user_id)
+  song_titles = ''
+  for s in songs_result:
+    song_titles = song_titles + str(s['song_title']) + '\n'
+  print('songs = ' + song_titles)
+  print('USERID = ' + current_app.user_id)
+  songs_result.close()
+#playlists_result = g.conn.execute("SELECT playlist_name FROM playlists WHERE users.userid=%s;", USERID)
+
+  context = dict(songs=song_titles)
+  return render_template("homepage.html", **context)
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
@@ -213,6 +228,8 @@ def login2():
   result = g.conn.execute("SELECT pwd FROM users WHERE users.userid=%s;", userid)
   for row in result:
     if password == row['pwd']:
+      current_app.user_id = userid
+      print('set USERID to ' + current_app.user_id)
       print('Successful login')
       return redirect('/homepage')
     else:
