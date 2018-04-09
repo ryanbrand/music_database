@@ -185,17 +185,26 @@ def homepage():
   #for a in artists:
   #  artists = artists  + str(a['artist_name']) + '\n'
   #artists_result.close()
-  #albums_result = g.conn.execute("SELECT album_name FROM albums WHERE users.userid=%s;", USERID)
+
+  albums_result = g.conn.execute("SELECT album_title FROM album_saved_by a WHERE a.userid=%s;", current_app.user_id)
+  album_titles = ''
+  for a in albums_result:
+    album_titles = album_titles + str(a['album_title']) + '\n'
+  albums_result.close()
+
   songs_result = g.conn.execute("SELECT song_title FROM song_saved_by s WHERE s.userid=%s;", current_app.user_id)
   song_titles = ''
   for s in songs_result:
     song_titles = song_titles + str(s['song_title']) + '\n'
-  print('songs = ' + song_titles)
-  print('USERID = ' + current_app.user_id)
   songs_result.close()
-#playlists_result = g.conn.execute("SELECT playlist_name FROM playlists WHERE users.userid=%s;", USERID)
+  
+  playlists_result = g.conn.execute("SELECT playlist_name FROM playlists p WHERE p.userid=%s;", current_app.user_id)
+  playlist_titles = ''
+  for p in playlists_result:
+    playlist_titles = playlist_titles + str(p['playlist_name']) + '\n'
+  playlists_result.close()
 
-  context = dict(songs=song_titles)
+  context = dict(songs=song_titles, albums=album_titles, playlists=playlist_titles)
   return render_template("homepage.html", **context)
 
 # Example of adding new data to the database
