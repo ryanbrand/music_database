@@ -8,7 +8,7 @@
 
 
 <body>
-  <h1>My Music</h1>
+  <h1>Artist Results</h1>
 
 <p><a href="logout">Logout</a></p>
 
@@ -26,26 +26,9 @@ type="submit" value="Find Album"></p>
 type="submit" value="Find Song"></p>
 </form>
 
-
-<p>My Albums</p>
-<textarea readonly name="saved_albums"
+<p>Albums</p>
+<textarea readonly name="albums"
    rows="10" cols="50">{{albums}}</textarea>
-
-<p>My Songs</p>
-<textarea readonly name="saved_songs"
-   rows="10" cols="50">{{songs}}</textarea>
-
-<p>My Private Playlists</p>
-<textarea readonly name="private_playlists"
-   rows="10" cols="50">{{private_playlists}}</textarea>
-
-<p>My Collaborative Playlists</p>
-<textarea readonly name="collaborative_playlists"
-   rows="10" cols="50">{{collaborative_playlists}}</textarea>
-
-<p>Other Playlists I Can Edit</p>
-<textarea readonly name="friend_playlists"
-   rows="10" cols="50">{{friend_playlists}}</textarea>
 
 </body>
 

@@ -256,6 +256,16 @@ def login2():
     else:
       return redirect('/login_fail')
 
+@app.route('/search_artist', methods=['POST'])
+def search_artist():
+  artist_name = request.form['artist_name']
+  result = g.conn.execute("SELECT album_title FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid;", artist_name)
+  album_titles = ''
+  for row in result:
+    album_titles = album_titles + str(row['album_title']) + '\n'
+  result.close()
+  context = dict(albums=album_titles)
+  return render_template("artist_results.html", **context)
 
 if __name__ == "__main__":
   import click
