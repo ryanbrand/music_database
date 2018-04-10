@@ -12,17 +12,25 @@
 
 <p><a href="logout">Logout</a></p>
 
-<p>Saved Songs</p>
+<p>My Albums</p>
+<textarea readonly name="saved_albums"
+   rows="10" cols="50">{{albums}}</textarea>
+
+<p>My Songs</p>
 <textarea readonly name="saved_songs"
    rows="10" cols="50">{{songs}}</textarea>
 
-<p>Saved Playlists</p>
-<textarea readonly name="saved_artists"
-   rows="10" cols="50">{{playlists}}</textarea>
+<p>My Private Playlists</p>
+<textarea readonly name="private_playlists"
+   rows="10" cols="50">{{private_playlists}}</textarea>
 
-<p>Saved Albums</p>
-<textarea readonly name="saved_albums"
-   rows="10" cols="50">{{albums}}</textarea>
+<p>My Collaborative Playlists</p>
+<textarea readonly name="collaborative_playlists"
+   rows="10" cols="50">{{collaborative_playlists}}</textarea>
+
+<p>Other Playlists I Can Edit</p>
+<textarea readonly name="friend_playlists"
+   rows="10" cols="50">{{friend_playlists}}</textarea>
 
 </body>
 

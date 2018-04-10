@@ -186,10 +186,10 @@ def homepage():
   #  artists = artists  + str(a['artist_name']) + '\n'
   #artists_result.close()
 
-  albums_result = g.conn.execute("SELECT album_title FROM album_saved_by a WHERE a.userid=%s;", current_app.user_id)
+  albums_result = g.conn.execute("SELECT album_title, artist_name FROM album_saved_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid;", current_app.user_id)
   album_titles = ''
   for a in albums_result:
-    album_titles = album_titles + str(a['album_title']) + '\n'
+    album_titles = album_titles + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
   albums_result.close()
 
   songs_result = g.conn.execute("SELECT song_title FROM song_saved_by s WHERE s.userid=%s;", current_app.user_id)
@@ -198,13 +198,25 @@ def homepage():
     song_titles = song_titles + str(s['song_title']) + '\n'
   songs_result.close()
   
-  playlists_result = g.conn.execute("SELECT playlist_name FROM playlists p WHERE p.userid=%s;", current_app.user_id)
-  playlist_titles = ''
-  for p in playlists_result:
-    playlist_titles = playlist_titles + str(p['playlist_name']) + '\n'
-  playlists_result.close()
+  priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", current_app.user_id)
+  priv_playlist_titles = ''
+  for p in priv_playlists_result:
+    priv_playlist_titles = priv_playlist_titles + str(p['playlist_name']) + '\n'
+  priv_playlists_result.close()
 
-  context = dict(songs=song_titles, albums=album_titles, playlists=playlist_titles)
+  coll_playlists_result = g.conn.execute("SELECT playlist_name FROM collaborative_playlists p WHERE p.userid=%s;", current_app.user_id)
+  coll_playlist_titles = ''
+  for p in coll_playlists_result:
+    coll_playlist_titles = coll_playlist_titles + str(p['playlist_name']) + '\n'
+  coll_playlists_result.close()
+
+  friend_playlists_result = g.conn.execute("SELECT playlist_name FROM can_edit p WHERE p.collaborator_userid=%s;", current_app.user_id)
+  friend_playlist_titles = ''
+  for p in friend_playlists_result:
+    friend_playlist_titles = friend_playlist_titles + str(p['playlist_name']) + '\n'
+  friend_playlists_result.close()
+
+  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles)
   return render_template("homepage.html", **context)
 
 # Example of adding new data to the database
