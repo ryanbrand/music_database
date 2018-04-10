@@ -192,10 +192,10 @@ def homepage():
     album_titles = album_titles + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
   albums_result.close()
 
-  songs_result = g.conn.execute("SELECT song_title FROM song_saved_by s WHERE s.userid=%s;", current_app.user_id)
+  songs_result = g.conn.execute("SELECT song_title, album_title, artist_name FROM song_saved_by s, artists t WHERE s.userid=%s AND s.artistid=t.artistid;", current_app.user_id)
   song_titles = ''
   for s in songs_result:
-    song_titles = song_titles + str(s['song_title']) + '\n'
+    song_titles = song_titles + str(s['song_title']) + ' from ' + str(s['album_title']) + ' by ' + str(s['artist_name']) + '\n'
   songs_result.close()
   
   priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", current_app.user_id)
@@ -210,10 +210,10 @@ def homepage():
     coll_playlist_titles = coll_playlist_titles + str(p['playlist_name']) + '\n'
   coll_playlists_result.close()
 
-  friend_playlists_result = g.conn.execute("SELECT playlist_name FROM can_edit p WHERE p.collaborator_userid=%s;", current_app.user_id)
+  friend_playlists_result = g.conn.execute("SELECT playlist_name, user_name, userid FROM can_edit p, users u WHERE p.collaborator_userid=%s AND p.creator_userid=u.userid;", current_app.user_id)
   friend_playlist_titles = ''
   for p in friend_playlists_result:
-    friend_playlist_titles = friend_playlist_titles + str(p['playlist_name']) + '\n'
+    friend_playlist_titles = friend_playlist_titles + str(p['playlist_name']) + ' (Created by ' + str(p['user_name']) + ': ' + str(p['userid']) + ')\n'
   friend_playlists_result.close()
 
   context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles)
