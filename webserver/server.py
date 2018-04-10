@@ -259,13 +259,26 @@ def login2():
 @app.route('/search_artist', methods=['POST'])
 def search_artist():
   artist_name = request.form['artist_name']
-  result = g.conn.execute("SELECT album_title FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid;", artist_name)
+  result = g.conn.execute("SELECT a.artistid, album_title FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid;", artist_name)
   album_titles = ''
   for row in result:
+    current_app.artist_id = str(row['artistid'])
     album_titles = album_titles + str(row['album_title']) + '\n'
   result.close()
   context = dict(albums=album_titles)
   return render_template("artist_results.html", **context)
+
+@app.route('/search_album', methods=['POST'])
+def search_album():
+  album_title = request.form['album_title']
+  result = g.conn.execute("SELECT song_title FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", current_app.artist_id, album_title)
+  song_titles = ''
+  for row in result:
+    song_titles = song_titles + str(row['song_title']) + '\n'
+  result.close()
+  context = dict(songs=song_titles)
+  return render_template("album_results.html", **context)
+
 
 if __name__ == "__main__":
   import click
