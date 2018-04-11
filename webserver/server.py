@@ -265,6 +265,12 @@ def search_artist():
     current_app.artist_id = str(row['artistid'])
     album_titles = album_titles + str(row['album_title']) + '\n'
   result.close()
+  
+  result2 = g.conn.execute("SELECT f.artistid, f.album_title FROM features f, artists a WHERE a.artist_name=%s AND f.featured_artistid=a.artistid", artist_name)
+  for row in result2:
+    current_app.artist_id = str(row['artistid'])
+    album_titles = album_titles + str(row['album_title']) + '\n'
+
   context = dict(albums=album_titles)
   return render_template("artist_results.html", **context)
 
