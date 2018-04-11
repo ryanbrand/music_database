@@ -15,6 +15,7 @@ Read about it online.
 """
 
 import os
+import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, session, current_app
@@ -247,6 +248,7 @@ def login2():
   userid = request.form['userid']
   password = request.form['password']
   result = g.conn.execute("SELECT pwd FROM users WHERE users.userid=%s;", userid)
+
   for row in result:
     if password == row['pwd']:
       current_app.user_id = userid
@@ -259,31 +261,64 @@ def login2():
 @app.route('/search_artist', methods=['POST'])
 def search_artist():
   artist_name = request.form['artist_name']
-  result = g.conn.execute("SELECT a.artistid, album_title FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid;", artist_name)
+  result = g.conn.execute("SELECT * FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid ORDER BY b.release_date DESC;", artist_name)
   album_titles = ''
+  # if len(list(result)) == 0:
+  #   current_app.artist_id = str(row['artistid'])
+  #   return render_template("artist_fail.html")
+  # else:
   for row in result:
+    release_date = str(row['release_date'])
+    album_title = str(row['album_title'])
+    num_songs = str(row['num_songs'])
+    album_titles = album_titles + '{}: released {}, {} tracks)\n'.format(album_title, release_date, num_songs)
     current_app.artist_id = str(row['artistid'])
-    album_titles = album_titles + str(row['album_title']) + '\n'
   result.close()
-  
-  result2 = g.conn.execute("SELECT f.artistid, f.album_title FROM features f, artists a WHERE a.artist_name=%s AND f.featured_artistid=a.artistid", artist_name)
-  for row in result2:
-    current_app.artist_id = str(row['artistid'])
-    album_titles = album_titles + str(row['album_title']) + '\n'
-
-  context = dict(albums=album_titles)
+    
+  result2 = g.conn.execute("SELECT f.album_title, a.artist_name FROM features f, artists a WHERE f.featured_artistid=%s AND f.artistid=a.artistid", current_app.artist_id)
+  album_titles2 = ''
+  for row2 in result2:
+    album_titles2 = album_titles2 + str(row2['album_title']) + ' by ' + str(row2['artist_name']) + '\n'
+  result2.close()
+      
+  context = dict(artist_name=artist_name, albums=album_titles, albums_featured=album_titles2)
   return render_template("artist_results.html", **context)
 
 @app.route('/search_album', methods=['POST'])
 def search_album():
   album_title = request.form['album_title']
-  result = g.conn.execute("SELECT song_title FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", current_app.artist_id, album_title)
+  result = g.conn.execute("SELECT * FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", current_app.artist_id, album_title)
   song_titles = ''
+  current_app.album_title = album_title
+  # if len(list(result)) == 0:
+  #   return render_template("album_fail.html")
+  # else:
   for row in result:
-    song_titles = song_titles + str(row['song_title']) + '\n'
+    track_number = str(row['track_num'])
+    song_title = str(row['song_title'])
+    song_length = str(datetime.timedelta(minutes=row['song_length'])).split(".")[0]
+    song_titles = song_titles + '{}: {} ({})\n'.format(track_number, song_title, song_length)
   result.close()
-  context = dict(songs=song_titles)
+  context = dict(album_title=album_title, songs=song_titles)
   return render_template("album_results.html", **context)
+
+@app.route('/add_album', methods=['POST'])
+def add_album():
+  album_title = request.form['album_title']
+  try:
+    g.conn.execute('INSERT INTO album_saved_by VALUES (%s, %s, %s)', current_app.user_id, album_title, current_app.artist_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('album_fail.html')
+
+@app.route('/add_song', methods=['POST'])
+def add_song():
+  song_title = request.form['song_title']
+  try:
+    g.conn.execute('INSERT INTO song_saved_by VALUES (%s, %s, %s, %s)', current_app.user_id, song_title, current_app.album_title, current_app.artist_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('song_fail.html')
 
 
 if __name__ == "__main__":

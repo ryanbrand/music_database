@@ -8,20 +8,29 @@
 
 
 <body>
-  <h1>Artist Results</h1>
+  <h1>Results</h1>
 
 <p><a href="logout">Logout</a></p>
 
 <p><a href="homepage">Back to My Music</a></p>
 
-<p>Albums</p>
+<p>Albums by {{artist_name}}</p>
 <textarea readonly name="albums"
    rows="10" cols="50">{{albums}}</textarea>
 
 <form method="POST" action="/search_album">
-<p>Album: <input type="text" name="album_title"><input \
-type="submit" value="Go to Album"></p>
+<p>Go to Album by {{artist_name}}: <input type="text" name="album_title"><input \
+type="submit" value="Get Songs from this Album"></p>
 </form>
+
+<form method="POST" action="/add_album">
+<p>Add Album to My Music: <input type="text" name="album_title"><input \
+type="submit" value="Add"></p>
+</form>
+
+<p>Albums featuring {{artist_name}}</p>
+<textarea readonly name="albums"
+   rows="10" cols="50">{{albums_featured}}</textarea>
 
 </body>
 

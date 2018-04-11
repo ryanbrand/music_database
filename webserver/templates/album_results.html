@@ -8,15 +8,20 @@
 
 
 <body>
-  <h1>Album Results</h1>
+  <h1>Results</h1>
 
 <p><a href="logout">Logout</a></p>
 
 <p><a href="homepage">Back to My Music</a></p>
 
-<p>Songs</p>
+<p>Songs from {{album_title}}</p>
 <textarea readonly name="songs"
    rows="10" cols="50">{{songs}}</textarea>
+
+<form method="POST" action="/add_song">
+<p>Add Song to My Music: <input type="text" name="song_title"><input \
+type="submit" value="Add"></p>
+</form>
 
 </body>
 
