@@ -320,6 +320,18 @@ def add_song():
   except Exception as e:
     return render_template('song_fail.html')
 
+@app.route('/add_song_to_playlist', methods=['POST'])
+def add_song_to_playlist():
+  song_title = request.form['song_title']
+  playlist_name = request.form['playlist_name']
+  print('--------song_title=', song_title)
+  print('--------playlist_name=', playlist_name)
+  try:
+    result = g.conn.execute('INSERT INTO in_playlist VALUES (%s, %s, %s, %s, %s)', song_title, current_app.album_title, current_app.artist_id, playlist_name, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+     return render_template('playlist_fail.html') 
+
 @app.route('/private_playlist_create', methods=['POST'])
 def private_playlist_create():
   playlist_name = request.form['playlist_name']
