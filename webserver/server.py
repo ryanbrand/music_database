@@ -2,7 +2,7 @@
 
 """
 Columbia's COMS W4111.001 Introduction to Databases
-Example Webserver
+MusicDB Webserver
 
 To run locally:
 
@@ -23,36 +23,11 @@ from flask import Flask, request, render_template, g, redirect, Response, sessio
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-#
-# The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
-#
-# XXX: The URI should be in the format of: 
-#
-#     postgresql://USER:PASSWORD@35.227.79.146/proj1part2
-#
-# For example, if you had username gravano and password foobar, then the following line would be:
-#
-#     DATABASEURI = "postgresql://gravano:foobar@35.227.79.146/proj1part2"
-#
+# Set URI used to connect to database server
 DATABASEURI = "postgresql://rmb2208:4410@35.227.79.146/proj1part2"
 
-
-#
-# This line creates a database engine that knows how to connect to the URI above.
-#
+# Create database engine using URI
 engine = create_engine(DATABASEURI)
-
-#
-# Example of running queries in your database
-# Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
-#
-
-# result = engine.execute("""SELECT * FROM users;""")
-# for row in result:
-#   print(type(row))
-
-# engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""") 
-
 
 @app.before_request
 def before_request():
@@ -81,142 +56,83 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
-
-#
-# @app.route is a decorator around index() that means:
-#   run index() whenever the user tries to access the "/" path using a GET request
-#
-# If you wanted the user to go to, for example, localhost:8111/foobar/ with POST or GET then you could use:
-#
-#       @app.route("/foobar/", methods=["POST", "GET"])
-#
-# PROTIP: (the trailing / in the path is important)
-# 
-# see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
-# see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
-#
 @app.route('/')
 def index():
   """
-  request is a special object that Flask provides to access web request information:
-
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments, e.g., {a:1, b:2} for http://localhost?a=1&b=2
-
-  See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
+  Render index template
   """
+  return render_template("index.html")
 
-  # DEBUG: this is debugging code to see what request looks like
-  print request.args
-
-
-  #
-  # example of a database query
-  #
-  cursor = g.conn.execute("SELECT * FROM artists;")
-  names = []
-  for result in cursor:
-    names.append(result['artist_name'])  # can also be accessed using result[0]
-  cursor.close()
-
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be 
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #     
-  #     # creates a <div> tag for each element in data
-  #     # will print: 
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-  context = dict(data = names)
-
-
-  #
-  # render_template looks in the templates/ folder for files.
-  # for example, the below file reads template/index.html
-  #
-  return render_template("index.html", **context)
-
-#
-# This is an example of a different path.  You can see it at:
-# 
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
 @app.route('/new_user')
 def new_user():
+  """
+  Render new user template
+  """
   return render_template("new_user.html")
 
 @app.route('/logout')
 def logout():
+  """
+  Render index template upon logout
+  """
   return render_template("index.html")
 
 @app.route('/fail_new_user')
 def fail_new_user():
+  """
+  Render fail_new_user template
+  """
   return render_template("fail_new_user.html")
 
 @app.route('/login_fail')
 def login_fail():
+  """
+  Render login_fail template
+  """
   return render_template("login_fail.html")
 
 @app.route('/homepage')
 def homepage():
-  #artists_result = g.conn.execute("SELECT artist_name FROM artists  WHERE .userid=%s;", USERID)
-  #artists = ''
-  #for a in artists:
-  #  artists = artists  + str(a['artist_name']) + '\n'
-  #artists_result.close()
+  """
+  Query database for relevant user data and render on homepage template
+  """
 
+  # Obtain user albums from database
   albums_result = g.conn.execute("SELECT album_title, artist_name FROM album_saved_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid;", current_app.user_id)
   album_titles = ''
   for a in albums_result:
     album_titles = album_titles + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
   albums_result.close()
 
+  # Obtain user songs from database
   songs_result = g.conn.execute("SELECT song_title, album_title, artist_name FROM song_saved_by s, artists t WHERE s.userid=%s AND s.artistid=t.artistid;", current_app.user_id)
   song_titles = ''
   for s in songs_result:
     song_titles = song_titles + str(s['song_title']) + ' from ' + str(s['album_title']) + ' by ' + str(s['artist_name']) + '\n'
   songs_result.close()
   
+  # Obtain user playlists from database (private)
   priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", current_app.user_id)
   priv_playlist_titles = ''
   for p in priv_playlists_result:
     priv_playlist_titles = priv_playlist_titles + str(p['playlist_name']) + '\n'
   priv_playlists_result.close()
 
+  # Obtain user playlists from database (collaborative)
   coll_playlists_result = g.conn.execute("SELECT playlist_name FROM collaborative_playlists p WHERE p.userid=%s;", current_app.user_id)
   coll_playlist_titles = ''
   for p in coll_playlists_result:
     coll_playlist_titles = coll_playlist_titles + str(p['playlist_name']) + '\n'
   coll_playlists_result.close()
 
+  # Obtain other playlists from database
   friend_playlists_result = g.conn.execute("SELECT playlist_name, user_name, userid FROM can_edit p, users u WHERE p.collaborator_userid=%s AND p.creator_userid=u.userid;", current_app.user_id)
   friend_playlist_titles = ''
   for p in friend_playlists_result:
     friend_playlist_titles = friend_playlist_titles + str(p['playlist_name']) + ' (Created by ' + str(p['user_name']) + ': ' + str(p['userid']) + ')\n'
   friend_playlists_result.close()
 
+  # Obtain user ids and names of friends from database
   friends_result = g.conn.execute("SELECT userid_2, user_name FROM users u, are_friends f WHERE f.userid_1=%s AND f.userid_2=u.userid", current_app.user_id)
   friend_names = ''
   for f in friends_result:
@@ -226,15 +142,11 @@ def homepage():
   context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names)
   return render_template("homepage.html", **context)
 
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
-
 @app.route('/add_new_user', methods=['POST'])
 def add_new_user():
+  """
+  Add new user to database
+  """
   name = request.form['name']
   userid = request.form['userid']
   password = request.form['password']
@@ -251,6 +163,9 @@ def login():
 
 @app.route('/login2', methods=['POST'])
 def login2():
+  """
+  Process attempted user login
+  """
   userid = request.form['userid']
   password = request.form['password']
   result = g.conn.execute("SELECT pwd FROM users WHERE users.userid=%s;", userid)
@@ -266,6 +181,9 @@ def login2():
 
 @app.route('/search_artist', methods=['POST'])
 def search_artist():
+  """
+  Search database for albums by requested artist
+  """
   artist_name = request.form['artist_name']
   result = g.conn.execute("SELECT * FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid ORDER BY b.release_date DESC;", artist_name)
   album_titles = ''
@@ -292,6 +210,9 @@ def search_artist():
 
 @app.route('/search_album', methods=['POST'])
 def search_album():
+  """
+  Search database for songs from requested album
+  """
   album_title = request.form['album_title']
   result = g.conn.execute("SELECT * FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", current_app.artist_id, album_title)
   song_titles = ''
@@ -310,6 +231,9 @@ def search_album():
 
 @app.route('/add_album', methods=['POST'])
 def add_album():
+  """
+  Add album to current user's saved music
+  """
   album_title = request.form['album_title']
   try:
     g.conn.execute('INSERT INTO album_saved_by VALUES (%s, %s, %s)', current_app.user_id, album_title, current_app.artist_id)
@@ -319,6 +243,9 @@ def add_album():
 
 @app.route('/add_song', methods=['POST'])
 def add_song():
+  """
+  Add song to current user's saved music
+  """
   song_title = request.form['song_title']
   try:
     g.conn.execute('INSERT INTO song_saved_by VALUES (%s, %s, %s, %s)', current_app.user_id, song_title, current_app.album_title, current_app.artist_id)
@@ -328,6 +255,9 @@ def add_song():
 
 @app.route('/add_song_to_playlist', methods=['POST'])
 def add_song_to_playlist():
+  """
+  Add song to specified playlist
+  """
   song_title = request.form['song_title']
   playlist_name = request.form['playlist_name']
   print('--------song_title=', song_title)
@@ -340,6 +270,9 @@ def add_song_to_playlist():
 
 @app.route('/show_playlist_songs', methods=['POST'])
 def show_playlist_songs():
+  """
+  Display songs in specified playlist
+  """
   playlist_name = request.form['playlist_name']
   result = g.conn.execute('SELECT artist_name, song_title, album_title FROM in_playlist p, artists a WHERE p.playlist_name=%s AND p.userid=%s AND a.artistid=p.artistid', playlist_name, current_app.user_id)
   song_titles = ''
@@ -355,6 +288,9 @@ def show_playlist_songs():
 
 @app.route('/private_playlist_create', methods=['POST'])
 def private_playlist_create():
+  """
+  Create a new private playlist
+  """
   playlist_name = request.form['playlist_name']
   try:
     g.conn.execute('INSERT INTO playlists VALUES (%s, %s, %s)', playlist_name, str(datetime.date.today()), current_app.user_id)
@@ -365,6 +301,9 @@ def private_playlist_create():
 
 @app.route('/collab_playlist_create', methods=['POST'])
 def collab_playlist_create():
+  """
+  Create a new collaborative playlist
+  """
   playlist_name = request.form['playlist_name']
   try:
     g.conn.execute('INSERT INTO playlists VALUES (%s, %s, %s)', playlist_name, str(datetime.date.today()), current_app.user_id)
@@ -375,6 +314,9 @@ def collab_playlist_create():
 
 @app.route('/add_new_friend', methods=['POST'])
 def add_new_friend():
+  """
+  Add new friend
+  """
   friend = request.form['friend_id']
   try:
     g.conn.execute('INSERT INTO are_friends VALUES (%s, %s, current_date)', current_app.user_id, friend)
