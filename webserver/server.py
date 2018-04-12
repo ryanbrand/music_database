@@ -320,6 +320,26 @@ def add_song():
   except Exception as e:
     return render_template('song_fail.html')
 
+@app.route('/private_playlist_create', methods=['POST'])
+def private_playlist_create():
+  playlist_name = request.form['playlist_name']
+  try:
+    g.conn.execute('INSERT INTO playlists VALUES (%s, %s, %s)', playlist_name, str(datetime.date.today()), current_app.user_id)
+    g.conn.execute('INSERT INTO private_playlists VALUES (%s, %s, %s)', True, playlist_name, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('playlist_fail.html')
+
+@app.route('/collab_playlist_create', methods=['POST'])
+def collab_playlist_create():
+  playlist_name = request.form['playlist_name']
+  try:
+    g.conn.execute('INSERT INTO playlists VALUES (%s, %s, %s)', playlist_name, str(datetime.date.today()), current_app.user_id)
+    g.conn.execute('INSERT INTO collaborative_playlists VALUES (%s, %s)', playlist_name, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('playlist_fail.html')
+
 
 if __name__ == "__main__":
   import click
