@@ -217,7 +217,13 @@ def homepage():
     friend_playlist_titles = friend_playlist_titles + str(p['playlist_name']) + ' (Created by ' + str(p['user_name']) + ': ' + str(p['userid']) + ')\n'
   friend_playlists_result.close()
 
-  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles)
+  friends_result = g.conn.execute("SELECT userid_2, user_name FROM users u, are_friends f WHERE f.userid_1=%s AND f.userid_2=u.userid", current_app.user_id)
+  friend_names = ''
+  for f in friends_result:
+    friend_names = friend_names + str(f['user_name']) + ' (' + str(f['userid_2']) + ')' + '\n'
+  friends_result.close()  
+
+  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names)
   return render_template("homepage.html", **context)
 
 # Example of adding new data to the database
