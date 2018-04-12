@@ -26,6 +26,20 @@ type="submit" value="Find Albums by/featuring this Artist"></p>
 <textarea readonly name="saved_songs"
    rows="10" cols="50">{{songs}}</textarea>
 
+<p>My Public Playlists</p>
+<textarea readonly name="private_playlists"
+   rows="10" cols="50">{{public_playlists}}</textarea>
+
+<form method="POST" action="/show_playlist_songs">
+<p>View Public Playlist: <input type="text" name="playlist_name"><input \
+type="submit" value="Go"></p>
+</form>
+
+<form method="POST" action="/public_playlist_create">
+<p>Create Public Playlist: <input type="text" name="playlist_name"><input \
+type="submit" value="Create"></p>
+</form>
+
 <p>My Private Playlists</p>
 <textarea readonly name="private_playlists"
    rows="10" cols="50">{{private_playlists}}</textarea>
