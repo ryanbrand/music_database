@@ -30,7 +30,7 @@ type="submit" value="Find Albums by/featuring this Artist"></p>
 <textarea readonly name="private_playlists"
    rows="10" cols="50">{{private_playlists}}</textarea>
 
-<form method="POST" action="/private_playlist_go">
+<form method="POST" action="/show_playlist_songs">
 <p>View Private Playlist: <input type="text" name="playlist_name"><input \
 type="submit" value="Go"></p>
 </form>
@@ -44,7 +44,7 @@ type="submit" value="Create"></p>
 <textarea readonly name="collaborative_playlists"
    rows="10" cols="50">{{collaborative_playlists}}</textarea>
 
-<form method="POST" action="/collab_playlist_go">
+<form method="POST" action="/show_playlist_songs">
 <p>View Collaborative Playlist: <input type="text" name="playlist_name"><input \
 type="submit" value="Go"></p>
 </form>
@@ -58,7 +58,7 @@ type="submit" value="Create"></p>
 <textarea readonly name="friend_playlists"
    rows="10" cols="50">{{friend_playlists}}</textarea>
 
-<form method="POST" action="/friend_playlist_go">
+<form method="POST" action="/show_playlist_songs">
 <p>View Other Playlist: <input type="text" name="playlist_name"><input \
 type="submit" value="Go"></p>
 </form>
