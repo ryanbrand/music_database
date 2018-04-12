@@ -373,6 +373,14 @@ def collab_playlist_create():
   except Exception as e:
     return render_template('playlist_fail.html')
 
+@app.route('/add_new_friend', methods=['POST'])
+def add_new_friend():
+  friend = request.form['friend_id']
+  try:
+    g.conn.execute('INSERT INTO are_friends VALUES (%s, %s, current_date)', current_app.user_id, friend)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('add_new_friend_fail.html') 
 
 if __name__ == "__main__":
   import click
