@@ -418,6 +418,20 @@ def rate_song():
     return render_template('song_rating_fail.html')
 
 
+@app.route('/suggest_song', methods=['POST'])
+def suggest_song():
+  """
+  Add song to current user's saved music
+  """
+  song_title = request.form['song']
+  user = request.form['user']
+  try:
+    g.conn.execute('INSERT INTO suggested_song VALUES (%s, %s, %s, %s, %s)', song_title, current_app.album_title, current_app.artist_id, user, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('song_suggest_fail.html')
+
+
 @app.route('/delete_song', methods=['POST'])
 def delete_song():
   """

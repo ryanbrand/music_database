@@ -39,7 +39,7 @@ type="submit" value="Add"></p>
 <p>Rate Song: </p>
 <p>Song Name: <input type="text" name="song">
 <p>Rating (0-5): <input type="text" name="rating"><input \
-type="submit" value="Add"></p>
+type="submit" value="Rate"></p>
 </form>
 
 
@@ -49,6 +49,14 @@ type="submit" value="Add"></p>
 <p>Playlist Name: <input type="text" name="playlist_name"><input \
 type="submit" value="Remove"></p>
 </form>
+
+<form method="POST" action="/suggest_song">
+<p>Suggest Song to User: </p>
+<p>Song Name: <input type="text" name="song">
+<p>User: <input type="text" name="user"><input \
+type="submit" value="Suggest"></p>
+</form>
+
 
 </body>
 
