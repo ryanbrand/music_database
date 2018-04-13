@@ -192,6 +192,20 @@ def view_friend():
         song_titles = song_titles + str(s['song_title']) + ' from ' + str(s['album_title']) + ' by ' + str(s['artist_name']) + '\n'
       songs_result.close()
 
+      # Obtain user album ratings from database
+      album_ratings_result = g.conn.execute("SELECT album_title, artist_name, album_rating FROM album_rated_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid ORDER BY album_rating DESC;", friendid)
+      album_ratings = ''
+      for a in album_ratings_result:
+        album_ratings = album_ratings + str(a['album_rating']) + ': ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
+      album_ratings_result.close()
+
+      # Obtain user song ratings from database
+      song_ratings_result = g.conn.execute("SELECT song_title, album_title, artist_name, song_rating FROM song_rated_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid ORDER BY song_rating DESC;", current_app.user_id)
+      song_ratings = ''
+      for a in song_ratings_result:
+        song_ratings = song_ratings + str(a['song_rating']) + ': ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
+      song_ratings_result.close()
+
       # Obtain user playlists from database (private)
       priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", friendid)
       priv_playlist_titles = ''
@@ -206,7 +220,7 @@ def view_friend():
         coll_playlist_titles = coll_playlist_titles + str(p['playlist_name']) + '\n'
       coll_playlists_result.close()
 
-      context = dict(songs=song_titles, albums=album_titles, personal_playlists=priv_playlist_titles, collaborative_playlists = coll_playlist_titles)
+      context = dict(songs=song_titles, albums=album_titles, personal_playlists=priv_playlist_titles, collaborative_playlists = coll_playlist_titles, song_ratings=song_ratings, album_ratings=album_ratings)
       return render_template('/homepage_friends.html', **context)
     else:
       return render_template('view_friend_fail.html')
