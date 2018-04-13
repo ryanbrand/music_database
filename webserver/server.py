@@ -265,6 +265,36 @@ def search_album():
   context = dict(album_title=album_title, songs=song_titles)
   return render_template("album_results.html", **context)
 
+@app.route('/genre_album', methods=['POST'])
+def genre_album():
+  """
+  Search database for songs from requested album
+  """
+  album_title = request.form['album']
+  artist_name = request.form['artist']
+  try:
+    result = g.conn.execute("SELECT artistid FROM artists WHERE artists.artist_name=%s",artist_name)
+    artist_id =''
+    if(result.returns_rows):
+      for r in result:
+         artist_id = str(r['artistid'])
+
+      result2 = g.conn.execute("SELECT * FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", artist_id, album_title)
+      song_titles = ''
+      current_app.album_title = album_title
+      for row in result2:
+        track_number = str(row['track_num'])
+        song_title = str(row['song_title'])
+        song_length = str(datetime.timedelta(minutes=row['song_length'])).split(".")[0]
+        song_titles = song_titles + '{}: {} ({})\n'.format(track_number, song_title, song_length)
+      result.close()
+      context = dict(album_title=album_title, songs=song_titles)
+      return render_template("album_results.html", **context)
+    return render_template('album_fail.html')
+  except Exception as e:
+    return render_template('album_fail.html')
+
+
 @app.route('/add_album', methods=['POST'])
 def add_album():
   """
