@@ -180,15 +180,16 @@ def login2():
   userid = request.form['userid']
   password = request.form['password']
   result = g.conn.execute("SELECT pwd FROM users WHERE users.userid=%s;", userid)
-
-  for row in result:
-    if password == row['pwd']:
-      current_app.user_id = userid
-      print('set USERID to ' + current_app.user_id)
-      print('Successful login')
-      return redirect('/homepage')
-    else:
-      return redirect('/login_fail')
+  if(result.returns_rows):
+    for row in result:
+      if password == row['pwd']:
+        current_app.user_id = userid
+        print('set USERID to ' + current_app.user_id)
+        print('Successful login')
+        return redirect('/homepage')
+      else:
+        return redirect('/login_fail')
+  return redirect('/login_fail')
 
 @app.route('/search_artist', methods=['POST'])
 def search_artist():
@@ -198,10 +199,8 @@ def search_artist():
   artist_name = request.form['artist_name']
   result = g.conn.execute("SELECT * FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid ORDER BY b.release_date DESC;", artist_name)
   album_titles = ''
-  # if len(list(result)) == 0:
-  #   current_app.artist_id = str(row['artistid'])
-  #   return render_template("artist_fail.html")
-  # else:
+  if len(list(result)) == 0:
+    return render_template("artist_fail.html")
   for row in result:
     release_date = str(row['release_date'])
     album_title = str(row['album_title'])
@@ -255,9 +254,8 @@ def search_album():
   result = g.conn.execute("SELECT * FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", current_app.artist_id, album_title)
   song_titles = ''
   current_app.album_title = album_title
-  # if len(list(result)) == 0:
-  #   return render_template("album_fail.html")
-  # else:
+  if len(list(result)) == 0:
+    return render_template("album_fail.html")
   for row in result:
     track_number = str(row['track_num'])
     song_title = str(row['song_title'])
