@@ -39,31 +39,17 @@ type="submit" value="Find Albums & Songs of This Genre"></p>
 <textarea readonly name="song_ratings"
    rows="10" cols="50">{{song_ratings}}</textarea>
 
-<p>My Public Playlists</p>
-<textarea readonly name="private_playlists"
-   rows="10" cols="50">{{public_playlists}}</textarea>
-
-<form method="POST" action="/show_playlist_songs">
-<p>View Public Playlist: <input type="text" name="playlist_name"><input \
-type="submit" value="Go"></p>
-</form>
-
-<form method="POST" action="/public_playlist_create">
-<p>Create Public Playlist: <input type="text" name="playlist_name"><input \
-type="submit" value="Create"></p>
-</form>
-
-<p>My Private Playlists</p>
+<p>My Personal Playlists</p>
 <textarea readonly name="private_playlists"
    rows="10" cols="50">{{private_playlists}}</textarea>
 
 <form method="POST" action="/show_playlist_songs">
-<p>View Private Playlist: <input type="text" name="playlist_name"><input \
+<p>View Personal Playlist: <input type="text" name="playlist_name"><input \
 type="submit" value="Go"></p>
 </form>
 
 <form method="POST" action="/private_playlist_create">
-<p>Create Private Playlist: <input type="text" name="playlist_name"><input \
+<p>Create Personal Playlist: <input type="text" name="playlist_name"><input \
 type="submit" value="Create"></p>
 </form>
 
@@ -110,7 +96,7 @@ type="submit" value="Add"></p>
 
 <p>View Friend's Music</p>
 <form method="POST" action="/view_friend">
-<p>Enter the ID of a Friend: <input type="text" name="friend_id"><input \
+<p>Enter the ID of a User Who Has Added You: <input type="text" name="friend_id"><input \
 type="submit" value="View"></p>
 </form>
 
