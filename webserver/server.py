@@ -153,6 +153,52 @@ def homepage():
 
   return render_template("homepage.html", **context)
 
+
+@app.route('/view_friend', methods=['POST'])
+def view_friend():
+  """
+  Query database for relevant user data and render on homepage template
+  """
+  friendid = request.form['friend_id']
+  try:
+    result = g.conn.execute("SELECT * FROM are_friends f WHERE f.userid_1=%s AND f.userid_2=%s", friendid, current_app.user_id)
+    print(current_app.user_id)
+    if len(list(result)) != 0:
+      # Obtain user albums from database
+      albums_result = g.conn.execute("SELECT album_title, artist_name FROM album_saved_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid;", friendid)
+      album_titles = ''
+      for a in albums_result:
+        album_titles = album_titles + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
+      albums_result.close()
+
+      # Obtain user songs from database
+      songs_result = g.conn.execute("SELECT song_title, album_title, artist_name FROM song_saved_by s, artists t WHERE s.userid=%s AND s.artistid=t.artistid;", friendid)
+      song_titles = ''
+      for s in songs_result:
+        song_titles = song_titles + str(s['song_title']) + ' from ' + str(s['album_title']) + ' by ' + str(s['artist_name']) + '\n'
+      songs_result.close()
+
+      # Obtain user playlists from database (private)
+      priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", friendid)
+      priv_playlist_titles = ''
+      for p in priv_playlists_result:
+        priv_playlist_titles = priv_playlist_titles + str(p['playlist_name']) + '\n'
+      priv_playlists_result.close()
+
+      # Obtain user playlists from database (collaborative)
+      coll_playlists_result = g.conn.execute("SELECT playlist_name FROM collaborative_playlists p WHERE p.userid=%s;", friendid)
+      coll_playlist_titles = ''
+      for p in coll_playlists_result:
+        coll_playlist_titles = coll_playlist_titles + str(p['playlist_name']) + '\n'
+      coll_playlists_result.close()
+
+      context = dict(songs=song_titles, albums=album_titles, personal_playlists=priv_playlist_titles, collaborative_playlists = coll_playlist_titles)
+      return render_template('/homepage_friends.html', **context)
+    else:
+      return render_template('view_friend_fail.html')
+  except Exception as e:
+    return render_template('view_friend_fail.html')
+
 @app.route('/add_new_user', methods=['POST'])
 def add_new_user():
   """

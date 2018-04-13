@@ -23,7 +23,6 @@ type="submit" value="Find Albums by/featuring this Artist"></p>
 type="submit" value="Find Albums & Songs of This Genre"></p>
 </form>
 
-
 <p>My Albums</p>
 <textarea readonly name="saved_albums"
    rows="10" cols="50">{{albums}}</textarea>
@@ -93,6 +92,13 @@ Users Who Have Added Me
 <form method="POST" action="/add_new_friend">
 <p>Add New Friend by Unique User ID: <input type="text" name="friend_id"><input \
 type="submit" value="Add"></p>
+</form>
+
+<p>View Friend's Music</p>
+<form method="POST" action="/view_friend">
+<p>Enter the ID of a Friend: <input type="text" name="friend_id"><input \
+type="submit" value="View"></p>
+</form>
 
 </body>
 
