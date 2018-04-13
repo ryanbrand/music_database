@@ -73,6 +73,12 @@ type="submit" value="Go"></p>
 type="submit" value="Create"></p>
 </form>
 
+<form method="POST" action="/add_collaborator">
+<p>Add Collaborator to Playlist</p> 
+<p>Playlist Name: <input type="text" name="playlist_name">User ID:<input type="text" name="userid"><input \
+type="submit" value="Add"></p>
+</form>
+
 <p>Other Playlists I Can Edit</p>
 <textarea readonly name="friend_playlists"
    rows="10" cols="50">{{friend_playlists}}</textarea>
