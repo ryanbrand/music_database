@@ -23,6 +23,11 @@
 type="submit" value="Add"></p>
 </form>
 
+<form method="POST" action="/delete_song">
+<p>Remove Song from My Music: <input type="text" name="song_title"><input \
+type="submit" value="Delete"></p>
+</form>
+
 <form method="POST" action="/add_song_to_playlist">
 <p>Add Song to Playlist: </p>
 <p>Song Name: <input type="text" name="song_title">
@@ -30,6 +35,12 @@ type="submit" value="Add"></p>
 type="submit" value="Add"></p>
 </form>
 
+<form method="POST" action="/remove_song_from_playlist">
+<p>Remove Song from Playlist: </p>
+<p>Song Name: <input type="text" name="song_title">
+<p>Playlist Name: <input type="text" name="playlist_name"><input \
+type="submit" value="Remove"></p>
+</form>
 
 </body>
 
