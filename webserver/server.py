@@ -349,6 +349,18 @@ def add_album():
   except Exception as e:
     return render_template('album_fail.html')
 
+@app.route('/rate_album', methods=['POST'])
+def rate_album():
+  album_title = request.form['album_title']
+  rating = request.form['rating']
+
+  try:
+    g.conn.execute('INSERT INTO album_rated_by VALUES (%s, %s, %s, %s)', current_app.user_id, album_title, current_app.artist_id, rating)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('album_rate_fail.html')
+
+
 @app.route('/genre_add_album', methods=['POST'])
 def genre_add_album():
   """
