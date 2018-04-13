@@ -349,6 +349,19 @@ def add_album():
   except Exception as e:
     return render_template('album_fail.html')
 
+@app.route('/delete_album', methods=['POST'])
+def delete_album():
+  """
+  Remove album current user's saved music
+  """
+  album_title = request.form['album_title']
+  try:
+    g.conn.execute('DELETE FROM album_saved_by WHERE userid=%s AND album_title=%s AND artistid=%s;', current_app.user_id, album_title, current_app.artist_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('album_fail.html')
+
+
 @app.route('/genre_add_album', methods=['POST'])
 def genre_add_album():
   """
@@ -381,6 +394,19 @@ def add_song():
   except Exception as e:
     return render_template('song_fail.html')
 
+@app.route('/delete_song', methods=['POST'])
+def delete_song():
+  """
+  Delete song from current user's saved music
+  """
+  song_title = request.form['song_title']
+  try:
+    g.conn.execute('DELETE FROM song_saved_by WHERE userid=%s AND song_title=%s AND album_title= %s AND artistid=%s;', current_app.user_id, song_title, current_app.album_title, current_app.artist_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('song_fail.html')
+
+
 @app.route('/genre_add_song', methods=['POST'])
 def genre_add_song():
   """
@@ -412,6 +438,19 @@ def add_song_to_playlist():
   playlist_name = request.form['playlist_name']
   try:
     result = g.conn.execute('INSERT INTO in_playlist VALUES (%s, %s, %s, %s, %s)', song_title, current_app.album_title, current_app.artist_id, playlist_name, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+     return render_template('playlist_fail.html') 
+
+@app.route('/remove_song_from_playlist', methods=['POST'])
+def remove_song_from_playlist():
+  """
+  Remove song from specified playlist
+  """
+  song_title = request.form['song_title']
+  playlist_name = request.form['playlist_name']
+  try:
+    result = g.conn.execute('DELETE FROM in_playlist WHERE song_title=%s AND album_title= %s AND artistid=%s AND playlist_name=%s AND userid=%s;', song_title, current_app.album_title, current_app.artist_id, playlist_name, current_app.user_id)
     return redirect('/homepage')
   except Exception as e:
      return render_template('playlist_fail.html') 
