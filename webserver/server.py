@@ -322,10 +322,10 @@ def genre_album():
     if(result.returns_rows):
       for r in result:
          artist_id = str(r['artistid'])
-
+      current_app.artist_id = artist_id
+      current_app.album_title = album_title
       result2 = g.conn.execute("SELECT * FROM songs s WHERE s.artistid=%s AND s.album_title=%s;", artist_id, album_title)
       song_titles = ''
-      current_app.album_title = album_title
       for row in result2:
         track_number = str(row['track_num'])
         song_title = str(row['song_title'])
