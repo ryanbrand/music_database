@@ -124,7 +124,15 @@ def homepage():
   for a in song_ratings_result:
     song_ratings = song_ratings + str(a['song_rating']) + ': ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
   song_ratings_result.close()
+ 
+  # Obtain user suggested songs
+  suggested_result = g.conn.execute("SELECT song_title, album_title, artist_name, suggested_by FROM suggested_song s, artists t WHERE s.userid=%s AND s.artistid=t.artistid", current_app.user_id)
+  song_suggestions = ''
+  for a in suggested_result:
+    song_suggestions = song_suggestions + str(a['suggested_by']) + ' suggests: ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
+  suggested_result.close()
   
+ 
   # Obtain user playlists from database (private)
   priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", current_app.user_id)
   priv_playlist_titles = ''
@@ -163,7 +171,7 @@ def homepage():
   except Exception as e:
      print('^^^^^^^^^^',e)
      return render_template('index.html')
-  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names, added_me=added_me_names, song_ratings=song_ratings, album_ratings=album_ratings)
+  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names, added_me=added_me_names, song_ratings=song_ratings, album_ratings=album_ratings,suggested_songs=song_suggestions)
 
   return render_template("homepage.html", **context)
 
