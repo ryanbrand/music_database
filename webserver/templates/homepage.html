@@ -77,10 +77,13 @@ type="submit" value="Create"></p>
 type="submit" value="Go"></p>
 </form>
 
-<p>Friends</p>
+<p>Users I Have Added
 <textarea readonly name="are_friends"
     rows="10" value="50">{{friends}}</textarea>
-
+Users Who Have Added Me
+<textarea readonly name="added_me"
+    rows="10" value="50">{{added_me}}</textarea>
+</p>
 <form method="POST" action="/add_new_friend">
 <p>Add New Friend by Unique User ID: <input type="text" name="friend_id"><input \
 type="submit" value="Add"></p>

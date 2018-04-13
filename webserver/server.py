@@ -139,7 +139,18 @@ def homepage():
     friend_names = friend_names + str(f['user_name']) + ' (' + str(f['userid_2']) + ')' + '\n'
   friends_result.close()  
 
-  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names)
+  # Obtain user ids and names of users who have added logged in user as friend
+  try:
+    added_me_result = g.conn.execute("SELECT userid_1, user_name FROM users u, are_friends f WHERE f.userid_2=%s AND f.userid_1=u.userid", current_app.user_id)
+    added_me_names = ''
+    for a in added_me_result.fetchall():
+      print '>>>>>>>>>>>>', a
+      added_me_names = added_me_names + str(a['user_name']) + ' (' + str(a['userid_1']) + ')' + '\n'
+  except Exception as e:
+     print('^^^^^^^^^^',e)
+     return render_template('index.html')
+  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names, added_me=added_me_names)
+
   return render_template("homepage.html", **context)
 
 @app.route('/add_new_user', methods=['POST'])
@@ -260,8 +271,6 @@ def add_song_to_playlist():
   """
   song_title = request.form['song_title']
   playlist_name = request.form['playlist_name']
-  print('--------song_title=', song_title)
-  print('--------playlist_name=', playlist_name)
   try:
     result = g.conn.execute('INSERT INTO in_playlist VALUES (%s, %s, %s, %s, %s)', song_title, current_app.album_title, current_app.artist_id, playlist_name, current_app.user_id)
     return redirect('/homepage')
