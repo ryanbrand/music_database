@@ -124,7 +124,15 @@ def homepage():
   for a in song_ratings_result:
     song_ratings = song_ratings + str(a['song_rating']) + ': ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
   song_ratings_result.close()
+ 
+  # Obtain user suggested songs
+  suggested_result = g.conn.execute("SELECT song_title, album_title, artist_name, suggested_by FROM suggested_song s, artists t WHERE s.userid=%s AND s.artistid=t.artistid", current_app.user_id)
+  song_suggestions = ''
+  for a in suggested_result:
+    song_suggestions = song_suggestions + str(a['suggested_by']) + ' suggests: ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
+  suggested_result.close()
   
+ 
   # Obtain user playlists from database (private)
   priv_playlists_result = g.conn.execute("SELECT playlist_name FROM private_playlists p WHERE p.userid=%s;", current_app.user_id)
   priv_playlist_titles = ''
@@ -163,7 +171,7 @@ def homepage():
   except Exception as e:
      print('^^^^^^^^^^',e)
      return render_template('index.html')
-  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names, added_me=added_me_names, song_ratings=song_ratings, album_ratings=album_ratings)
+  context = dict(songs=song_titles, albums=album_titles, private_playlists=priv_playlist_titles, collaborative_playlists=coll_playlist_titles, friend_playlists=friend_playlist_titles, friends=friend_names, added_me=added_me_names, song_ratings=song_ratings, album_ratings=album_ratings,suggested_songs=song_suggestions)
 
   return render_template("homepage.html", **context)
 
@@ -446,6 +454,20 @@ def rate_song():
     return render_template('song_rating_fail.html')
 
 
+@app.route('/suggest_song', methods=['POST'])
+def suggest_song():
+  """
+  Add song to current user's saved music
+  """
+  song_title = request.form['song']
+  user = request.form['user']
+  try:
+    g.conn.execute('INSERT INTO suggested_song VALUES (%s, %s, %s, %s, %s)', song_title, current_app.album_title, current_app.artist_id, user, current_app.user_id)
+    return redirect('/homepage')
+  except Exception as e:
+    return render_template('song_suggest_fail.html')
+
+
 @app.route('/delete_song', methods=['POST'])
 def delete_song():
   """
@@ -539,16 +561,18 @@ def show_playlist_songs():
   playlist_name = request.form['playlist_name']
   result = g.conn.execute('SELECT artist_name, song_title, album_title FROM in_playlist p, artists a WHERE p.playlist_name=%s AND p.userid=%s AND a.artistid=p.artistid', playlist_name, current_app.user_id)
   song_titles = ''
-  for row in result:
-    song_title = str(row['song_title'])
-    album_title = str(row['album_title'])
-    artist_name = str(row['artist_name'])
-    print '~~~~~~~~~~~', song_title, album_title, artist_name
-    song_titles = song_titles + song_title  + " from " + album_title + " by " + artist_name + "\n"
-  result.close()
-   
-  context = dict(songs=song_titles, playlist=playlist_name)
-  return render_template('playlist_results.html', **context)
+  if(len(list(result)) != 0):
+    for row in result:
+      song_title = str(row['song_title'])
+      album_title = str(row['album_title'])
+      artist_name = str(row['artist_name'])
+      print '~~~~~~~~~~~', song_title, album_title, artist_name
+      song_titles = song_titles + song_title  + " from " + album_title + " by " + artist_name + "\n"
+    result.close()
+     
+    context = dict(songs=song_titles, playlist=playlist_name)
+    return render_template('playlist_results.html', **context)
+  return render_template('playlist_fail.html')
 
 @app.route('/private_playlist_create', methods=['POST'])
 def private_playlist_create():
