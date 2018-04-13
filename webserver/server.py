@@ -200,7 +200,7 @@ def view_friend():
       album_ratings_result.close()
 
       # Obtain user song ratings from database
-      song_ratings_result = g.conn.execute("SELECT song_title, album_title, artist_name, song_rating FROM song_rated_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid ORDER BY song_rating DESC;", current_app.user_id)
+      song_ratings_result = g.conn.execute("SELECT song_title, album_title, artist_name, song_rating FROM song_rated_by a, artists t WHERE a.userid=%s AND a.artistid=t.artistid ORDER BY song_rating DESC;", friendid)
       song_ratings = ''
       for a in song_ratings_result:
         song_ratings = song_ratings + str(a['song_rating']) + ': ' + str(a['song_title']) + ' from ' + str(a['album_title']) + ' by ' + str(a['artist_name']) + '\n'
