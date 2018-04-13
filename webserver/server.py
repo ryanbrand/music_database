@@ -245,8 +245,6 @@ def search_artist():
   artist_name = request.form['artist_name']
   result = g.conn.execute("SELECT * FROM artists a, albums b WHERE a.artist_name=%s AND a.artistid=b.artistid ORDER BY b.release_date DESC;", artist_name)
   album_titles = ''
-  if len(list(result)) == 0:
-    return render_template("artist_fail.html")
   for row in result:
     release_date = str(row['release_date'])
     album_title = str(row['album_title'])
