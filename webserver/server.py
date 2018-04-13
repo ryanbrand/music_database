@@ -454,7 +454,8 @@ def show_playlist_songs():
     song_title = str(row['song_title'])
     album_title = str(row['album_title'])
     artist_name = str(row['artist_name'])
-    song_titles = song_title + " from " + album_title + " by " + artist_name + "\n"
+    print '~~~~~~~~~~~', song_title, album_title, artist_name
+    song_titles = song_titles + " from " + album_title + " by " + artist_name + "\n"
   result.close()
    
   context = dict(songs=song_titles, playlist=playlist_name)
