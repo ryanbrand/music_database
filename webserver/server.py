@@ -219,6 +219,33 @@ def search_artist():
   context = dict(artist_name=artist_name, albums=album_titles, albums_featured=album_titles2)
   return render_template("artist_results.html", **context)
 
+@app.route('/search_genre', methods=['POST'])
+def search_genre():
+  """
+  Search DB for albums and songs of this genre
+  """
+
+  genre = request.form['genre']
+  result = g.conn.execute("SELECT album_title, artist_name FROM album_is_genre g, artists a WHERE g.artistid=a.artistid AND g.genre_name=%s", genre)
+  album_titles = ''
+  for r in result:
+    title = r['album_title'].encode()
+    artist = r['artist_name'].encode()
+    album_titles = album_titles + title + ' by ' + artist + '\n'
+  result.close()
+
+  result2 = g.conn.execute("SELECT song_title, album_title, artist_name FROM song_is_genre g, artists a WHERE g.artistid=a.artistid AND g.genre_name=%s", genre)
+  song_titles = ''
+  for r in result2:
+    song = r['song_title'].encode()
+    album = r['album_title'].encode()
+    artist = r['artist_name'].encode()
+    song_titles = song_titles + song + ' from ' + album + ' by ' + artist + '\n'
+  result2.close()
+
+  context = dict(albums=album_titles, songs=song_titles)
+  return render_template("genre_results.html", **context)
+  
 @app.route('/search_album', methods=['POST'])
 def search_album():
   """

@@ -1,0 +1,58 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>Results</h1>
+
+<p><a href="logout">Logout</a></p>
+
+<p><a href="homepage">Back to My Music</a></p>
+
+<p>Albums</p>
+<textarea readonly name="albums"
+   rows="10" cols="50">{{albums}}</textarea>
+
+<form method="POST" action="/genre_album">
+<p>Go to Album:</p>
+<p>Album Title: <input type="text" name="album">
+Artist Name: <input type="text" name="artist"></p>
+<p><input type="submit" value="Get Songs from this Album"></p>
+</form>
+
+<form method="POST" action="/genre_add_album">
+<p>Add Album to My Music:</p>
+<p>Album Title:</p> <input type="text" name="album">
+Artist Name:<input type="text" name="artist">
+<p><input type="submit" value="Add"></p>
+</form>
+
+<p>Songs</p>
+<textarea readonly name="genre_songs"
+   rows="10" cols="50">{{songs}}</textarea>
+
+<form method="POST" action="/genre_add_song">
+<p>Add Song to My Music:</p>
+Song Title:<input type="text" name="song">
+Album Title:<input type="text" name="album">
+Artist Name:<input type="text" name="artist">
+<p><input type="submit" value="Add"></p>
+</form>
+
+<form method="POST" action="/genre_add_to_playlist">
+<p>Add Song to Playlist: </p>
+Song Title:<input type="text" name="song">
+Album Title:<input type="text" name="album">
+Artist Name:<input type="text" name="artist">
+<p>Playlist Name: <input type="text" name="playlist_name">
+<p><input type="submit" value="Add"></p>
+</form>
+
+</body>
+
+</html>

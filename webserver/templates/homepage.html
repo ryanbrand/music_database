@@ -18,6 +18,12 @@
 type="submit" value="Find Albums by/featuring this Artist"></p>
 </form>
 
+<form method="POST" action="/search_genre">
+<p>Enter a genre: <input type="text" name="genre"><input \
+type="submit" value="Find Albums & Songs of This Genre"></p>
+</form>
+
+
 <p>My Albums</p>
 <textarea readonly name="saved_albums"
    rows="10" cols="50">{{albums}}</textarea>
