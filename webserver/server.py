@@ -561,18 +561,16 @@ def show_playlist_songs():
   playlist_name = request.form['playlist_name']
   result = g.conn.execute('SELECT artist_name, song_title, album_title FROM in_playlist p, artists a WHERE p.playlist_name=%s AND p.userid=%s AND a.artistid=p.artistid', playlist_name, current_app.user_id)
   song_titles = ''
-  if(len(list(result)) != 0):
-    for row in result:
-      song_title = str(row['song_title'])
-      album_title = str(row['album_title'])
-      artist_name = str(row['artist_name'])
-      print '~~~~~~~~~~~', song_title, album_title, artist_name
-      song_titles = song_titles + song_title  + " from " + album_title + " by " + artist_name + "\n"
-    result.close()
+  for row in result:
+    song_title = str(row['song_title'])
+    album_title = str(row['album_title'])
+    artist_name = str(row['artist_name'])
+    print '~~~~~~~~~~~', song_title, album_title, artist_name
+    song_titles = song_titles + song_title  + " from " + album_title + " by " + artist_name + "\n"
+  result.close()
      
-    context = dict(songs=song_titles, playlist=playlist_name)
-    return render_template('playlist_results.html', **context)
-  return render_template('playlist_fail.html')
+  context = dict(songs=song_titles, playlist=playlist_name)
+  return render_template('playlist_results.html', **context)
 
 @app.route('/private_playlist_create', methods=['POST'])
 def private_playlist_create():
