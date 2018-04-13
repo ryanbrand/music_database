@@ -277,6 +277,26 @@ def add_album():
   except Exception as e:
     return render_template('album_fail.html')
 
+@app.route('/genre_add_album', methods=['POST'])
+def genre_add_album():
+  """
+  Add album to current user's saved music
+  """
+  album_title = request.form['album']
+  artist_name = request.form['artist']
+  try:
+    result = g.conn.execute("SELECT artistid FROM artists WHERE artists.artist_name=%s",artist_name)
+    artist_id =''
+    if(result.returns_rows):
+      for r in result:
+         artist_id = str(r['artistid'])
+      g.conn.execute('INSERT INTO album_saved_by VALUES (%s, %s, %s)', current_app.user_id, album_title, artist_id)
+      return redirect('/homepage')
+    return render_template('album_fail.html')
+  except Exception as e:
+    return render_template('album_fail.html')
+
+
 @app.route('/add_song', methods=['POST'])
 def add_song():
   """
@@ -286,6 +306,28 @@ def add_song():
   try:
     g.conn.execute('INSERT INTO song_saved_by VALUES (%s, %s, %s, %s)', current_app.user_id, song_title, current_app.album_title, current_app.artist_id)
     return redirect('/homepage')
+  except Exception as e:
+    return render_template('song_fail.html')
+
+@app.route('/genre_add_song', methods=['POST'])
+def genre_add_song():
+  """
+  Add song to current user's saved music
+  """
+  song_title = request.form['song']
+  album_title = request.form['album']
+  artist_name = request.form['artist']
+  print '@@@@@@@@@@', song_title, album_title, artist_name
+  try:
+    result = g.conn.execute("SELECT artistid FROM artists WHERE artists.artist_name=%s",artist_name)
+    artist_id =''
+    if(result.returns_rows):
+      for r in result:
+        artist_id = str(r['artistid'])
+      print '@@@@@@@@@@', artist_id, current_app.user_id
+      g.conn.execute('INSERT INTO song_saved_by VALUES (%s, %s, %s, %s)', current_app.user_id, song_title, album_title, artist_id)
+      return redirect('/homepage')
+    return render_template('song_fail.html')
   except Exception as e:
     return render_template('song_fail.html')
 
@@ -301,6 +343,30 @@ def add_song_to_playlist():
     return redirect('/homepage')
   except Exception as e:
      return render_template('playlist_fail.html') 
+
+@app.route('/genre_add_to_playlist', methods=['POST'])
+def genre_add_to_playlist():
+  """
+  Add song to specified playlist
+  """
+  song_title = request.form['song']
+  album_title = request.form['album']
+  artist_name = request.form['artist']
+  playlist_name = request.form['playlist_name']
+  try:
+    result = g.conn.execute("SELECT artistid FROM artists WHERE artists.artist_name=%s",artist_name)
+    artist_id =''
+    if(result.returns_rows):
+      for r in result:
+        artist_id = str(r['artistid'])
+      print '@@@@@@@@@@', artist_id, current_app.user_id
+      g.conn.execute('INSERT INTO in_playlist VALUES (%s, %s, %s, %s, %s)', song_title, album_title, artist_id, playlist_name, current_app.user_id)
+      return redirect('/homepage')
+    return render_template('playlist_fail.html')
+  except Exception as e:
+    return render_template('playlist_fail.html')
+
+
 
 @app.route('/show_playlist_songs', methods=['POST'])
 def show_playlist_songs():
